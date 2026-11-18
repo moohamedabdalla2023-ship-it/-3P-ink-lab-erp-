@@ -296,6 +296,24 @@
                 "Page interface is ready. Database connection will be added in the next step.";
         });
 </script>
+<script src="config.js"></script>
 
+<script>
+    document.getElementById("inspectionDate").value =
+        new Date().toISOString().slice(0, 10);
+
+    document.getElementById("inspectionForm")
+        .addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const status = document.getElementById("inspectionStatus");
+            status.style.display = "block";
+            status.textContent =
+                "Page interface is ready. Database connection will be added in the next step.";
+        });
+</script>
+
+</body>
+</html>
 </body>
 </html>
