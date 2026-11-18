@@ -282,20 +282,7 @@
 
 </div>
 
-<script>
-    document.getElementById("inspectionDate").value =
-        new Date().toISOString().slice(0, 10);
 
-    document.getElementById("inspectionForm")
-        .addEventListener("submit", function(event) {
-            event.preventDefault();
-
-            const status = document.getElementById("inspectionStatus");
-            status.style.display = "block";
-            status.textContent =
-                "Page interface is ready. Database connection will be added in the next step.";
-        });
-</script>
 <script src="config.js"></script>
 
 <script>
@@ -303,17 +290,47 @@
         new Date().toISOString().slice(0, 10);
 
     document.getElementById("inspectionForm")
-        .addEventListener("submit", function(event) {
+        .addEventListener("submit", async function(event) {
             event.preventDefault();
 
             const status = document.getElementById("inspectionStatus");
+            const button = this.querySelector('button[type="submit"]');
+
+            button.disabled = true;
+            button.textContent = "Saving...";
             status.style.display = "block";
-            status.textContent =
-                "Page interface is ready. Database connection will be added in the next step.";
+            status.textContent = "Connecting to database...";
+
+            const record = {
+                result: document.getElementById("result").value,
+                notes: document.getElementById("notes").value,
+                created_at: new Date().toISOString()
+            };
+
+            try {
+                const response = await dbPost("sample_inspections", record);
+
+                if (!response.ok) {
+                    throw new Error(JSON.stringify(response.data));
+                }
+
+                status.textContent = "Inspection saved successfully!";
+                status.style.color = "#22c55e";
+
+                this.reset();
+                document.getElementById("inspectionDate").value =
+                    new Date().toISOString().slice(0, 10);
+
+            } catch (error) {
+                console.error("Save error:", error);
+                status.textContent = "Save failed: " + error.message;
+                status.style.color = "#ef4444";
+            } finally {
+                button.disabled = false;
+                button.textContent = "Save Inspection";
+            }
         });
 </script>
 
-</body>
-</html>
 </body>
 </html>
