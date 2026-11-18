@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulas — INK LAB ERP</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6393ff">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+
+<body>
+    <div class="bg-grid"></div>
+
+    <header>
+        <a class="logo-wrap" href="index.html" style="text-decoration:none">
+            <div class="logo-icon">⬡</div>
+            <div>
+                <h1>INK LAB</h1>
+                <span class="subtitle">ERP SYSTEM V2</span>
+            </div>
+        </a>
+        <nav>
+            <a href="index.html">Dashboard</a>
+            <a href="formulas.html" class="active">Formulas</a>
+            <a href="batches.html">Batches</a>
+            <a href="stock.html">Stock</a>
+
+        </nav>
+        <div class="header-right">
+            <div class="status-bar">
+                <span class="dot"></span>
+                <span id="clock">--:--:--</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <div class="page-title"><span>Formulas</span></div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🧪</div>
+                <div class="stat-label">Total Formulas</div>
+                <div class="stat-value" id="stat-total">—</div>
+            </div>
+
+        </div>
+
+        <div class="ink-calc-mobile-container"
+            style="max-width:480px;margin:0 auto;background:#0f172a;color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;padding:16px;box-sizing:border-box;">
+
+            <div style="text-align:center;padding:12px 0;border-bottom:1px solid #1e293b;margin-bottom:20px;">
+                <h1 style="font-size:1.25rem;font-weight:800;color:#3b82f6;margin:0;">
+                    Flexo Ink Calculator
+                </h1>
+                <p style="font-size:.75rem;color:#3888f7;margin:4px 0 0 0;">
+                    Solvent-Based Ink Estimation
+                </p>
+            </div>
+
+            <!-- Tabs -->
+            <div style="display:flex;background:#1e293b;padding:4px;border-radius:12px;margin-bottom:20px;gap:4px;">
+
+                <div id="tab-linear" onclick="switchCalcMode('linear')"
+                    style="flex:1;text-align:center;padding:12px;font-size:.85rem;font-weight:600;border-radius:8px;cursor:pointer;background:#3b82f6;color:#fff;">
+                    📏 Linear
+                </div>
+
+                <div id="tab-weight" onclick="switchCalcMode('weight')"
+                    style="flex:1;text-align:center;padding:12px;font-size:.85rem;font-weight:600;border-radius:8px;cursor:pointer;color:#94a3b8;">
+                    ⚖️ Weight
+                </div>
+
+                <div id="tab-pieces" onclick="switchCalcMode('pieces')"
+                    style="flex:1;text-align:center;padding:12px;font-size:.85rem;font-weight:600;border-radius:8px;cursor:pointer;color:#94a3b8;">
+                    📦 Pieces
+                </div>
+
+            </div>
+
+            <form id="flexo-calc-form" oninput="runLiveCalculation()">
+
+                <!-- Linear -->
+                <div id="section-linear">
+
+                    <div style="margin-bottom:14px;">
+                        <label style="display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">
+                            Length (m)
+                        </label>
+
+                        <input type="number" id="in-length-meter" value="10000"
+                            style="width:100%;padding:14px;background:#1e293b;border:1.5px solid #334155;border-radius:12px;color:#fff;box-sizing:border-box;">
+                    </div>
+
+                    <div style="margin-bottom:14px;">
+                        <label style="display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">
+                            Width (mm)
+                        </label>
+
+                        <input type="number" id="in-width-meter" value="800"
+                            style="width:100%;padding:14px;background:#1e293b;border:1.5px solid #334155;border-radius:12px;color:#fff;box-sizing:border-box;">
+                    </div>
+
+                </div>
+
+                <!-- Weight -->
+                <div id="section-weight" style="display:none;">
+
+                    <div style="margin-bottom:14px;">
+                        <label style="display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">
+                            Film Weight (KG)
+                        </label>
+
+                        <input type="number" id="in-film-weight" value="1000"
+                            style="width:100%;padding:14px;background:#1e293b;border:1.5px solid #334155;border-radius:12px;color:#fff;box-sizing:border-box;">
+                    </div>
+
+                    <div style="margin-bottom:14px;">
+                        <label style="display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">
+                            Width (mm)
+                        </label>
+
+                        <input type="number" id="in-width-weight" value="800"
+                            style="width:100%;padding:14px;background:#1e293b;border:1.5px solid #334155;border-radius:12px;color:#fff;box-sizing:border-box;">
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:12px;">
+
+                        <div>
+                            <label
+                                style="display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">
+                                Film Type
+                            </label>
+
+                            <select id="in-film-type"
+                                style="width:100%;padding:14px;background:#1e293b;border:1.5px solid #334155;border-radius:12px;color:#fff;">
+
+                                <option value="bopp">BOPP (0.91)</option>
+                                <option value="cpp">CPP (0.90)</option>
+                                <option value="ldpe">LDPE (0.92)</option>
+                                <option value="hdpe">HDPE (0.95)</option>
+                                <option value="pet">PET (1.39)</option>
+                                <option value="pvc">PVC (1.35)</option>
+
+                            </select>
+                        </div>
+
+                        <div>
+                            <label
+                                style="display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">
+                                Thickness (μm)
+                            </label>
+
+                            <input type="number" id="in-micron" value="50"
+                                style="width:100%;padding:14px;background:#1e293b;border:1.5px solid #334155;border-radius:12px;color:#fff;">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Pieces -->
+                <div id="section-pieces" style="display:none;">
+
+                    <div style="margin-bottom:14px;">
+                        <label style="display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">
+                            Total Pieces
+                        </label>
+
+                        <input type="number" id="in-pieces" value="50000"
+                            style="width:100%;padding:14px;background:#1e293b;border:1.5px solid #334155;border-radius:12px;color:#fff;">
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+
+                        <div>
+                            <label
+                                style="display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">
+                                Repeat Length (mm)
+                            </label>
+
+                            <input type="number" id="in-length" value="150"
+                                style="width:100%;padding:14px;background:#1e293b;border:1.5px solid #334155;border-radius:12px;color:#fff;">
+                        </div>
+
+                        <div>
+                            <label
+                                style="display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">
+                                Width (mm)
+                            </label>
+
+                            <input type="number" id="in-width" value="100"
+                                style="width:100%;padding:14px;background:#1e293b;border:1.5px solid #334155;border-radius:12px;color:#fff;">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div style="border-top:1px dashed #334155;margin:20px 0;padding-top:16px;"></div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+
+                    <div>
+                        <label style="display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">
+                            Coverage %
+                        </label>
+
+                        <input type="number" id="in-coverage" value="40"
+                            style="width:100%;padding:14px;background:#1e293b;border:1.5px solid #334155;border-radius:12px;color:#fff;">
+                    </div>
+
+                    <div>
+                        <label style="display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">
+                            Anilox (cm³/m²)
+                        </label>
+
+                        <input type="number" id="in-anilox-volume" value="6" step="0.1"
+                            style="width:100%;padding:14px;background:#1e293b;border:1.5px solid #334155;border-radius:12px;color:#fff;">
+                    </div>
+
+                </div>
+
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">
+                        Solvent % (dilution before printing)
+                    </label>
+
+                    <input type="number" id="in-solvent" value="10"
+                        style="width:100%;padding:14px;background:#1e293b;border:1.5px solid #334155;border-radius:12px;color:#fff;">
+                </div>
+
+            </form>
+
+            <div id="result-card"
+                style="background:linear-gradient(135deg,#1e293b,#0f172a);border:2px solid #3b82f6;border-radius:16px;padding:16px;text-align:center;box-shadow:0 10px 15px -3px rgba(0,0,0,.3);">
+
+                <div
+                    style="font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:4px;">
+                    Concentrated Ink Required
+                </div>
+
+                <div id="out-ink-weight" style="font-size:2.25rem;font-weight:900;color:#10b981;line-height:1.2;">
+                    0.000 KG
+                </div>
+
+                <div id="out-calc-warning"
+                    style="display:none;font-size:.78rem;color:#fbbf24;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:8px;padding:8px 10px;margin-top:10px;">
+                </div>
+
+                <div
+                    style="display:flex;justify-content:space-between;border-top:1px solid #334155;margin-top:12px;padding-top:12px;font-size:.8rem;color:#94a3b8;">
+                    <span>Calculated Area:</span>
+                    <strong id="out-total-area" style="color:#fff;">
+                        0 m²
+                    </strong>
+                </div>
+
+                <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:.8rem;color:#94a3b8;">
+                    <span>Ink per m²:</span>
+                    <strong id="out-ink-per-m2" style="color:#fff;">
+                        — g/m²
+                    </strong>
+                </div>
+
+                <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:.8rem;color:#94a3b8;">
+                    <span>Total diluted ink (incl. solvent):</span>
+                    <strong id="out-ink-diluted" style="color:#fff;">
+                        0.000 KG
+                    </strong>
+                </div>
+
+                <div id="out-ink-per-piece-row"
+                    style="display:none;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px dashed #334155;font-size:.8rem;color:#94a3b8;">
+                    <span>Ink per label/piece:</span>
+                    <strong id="out-ink-per-piece" style="color:#fbbf24;">
+                        0 g
+                    </strong>
+                </div>
+
+                <div id="out-ink-per-kg-film-row"
+                    style="display:none;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px dashed #334155;font-size:.8rem;color:#94a3b8;">
+                    <span>Ink per 1 kg of film:</span>
+                    <strong id="out-ink-per-kg-film" style="color:#fbbf24;">
+                        0 g/kg
+                    </strong>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ADD FORMULA -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title">Add New Formula</span>
+                <button class="btn btn-primary" id="toggle-btn" onclick="toggleForm()">+ Add Formula</button>
+            </div>
+
+            <div id="formula-form" style="display:none">
+                <div class="panel-body">
+
+                    <!-- BASIC INFO -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Formula Code *</label>
+                            <input id="f-code" placeholder="e.g. PMS-485" autocomplete="off" oninput="onColorInput()">
+
+                        </div>
+                        <div class="form-group">
+                            <label>Formula Name *</label>
+                            <input id="f-name" placeholder="e.g. Pantone 485 Red" oninput="onColorInput()">
+
+
+                        </div>
+                        <div class="form-group">
+                            <label>Pantone Number</label>
+                            <input id="pantoneNumber" placeholder="e.g. 186 C" oninput="checkPantoneMatch()">
+                        </div>
+                        <div id="pantone-match-box" style="display:none"></div>
+                        <div class="form-group">
+                            <label>Drum Size (KG)</label>
+                            <input id="f-drum" type="number" value="20" min="0.1" step="0.1" oninput="onColorInput()">
+                        </div>
+                        <div class="form-group">
+                            <label>Notes</label>
+                            <input id="f-notes" placeholder="Optional notes">
+                            <input id="tech-name" type="text" placeholder="Technician Name">
+                        </div>
+                    </div>
+
+                    <!-- INK COMPONENTS -->
+                    <div style="margin-top:22px;margin-bottom:14px;padding-bottom:10px;
+                    border-bottom:1px solid var(--border);font-size:0.82rem;font-weight:700;
+                    color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px">
+                        Ink Components — KG per drum
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group"><label>Cyan</label>
+                            <input id="f-cyan" type="number" value="0" min="0" step="0.001" oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>Magenta</label>
+                            <input id="f-magenta" type="number" value="0" min="0" step="0.001" oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>Yellow</label>
+                            <input id="f-yellow" type="number" value="0" min="0" step="0.001" oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>Black</label>
+                            <input id="f-black" type="number" value="0" min="0" step="0.001" oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>White</label>
+                            <input id="f-white" type="number" value="0" min="0" step="0.001" oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>Reflex Blue</label>
+                            <input id="f-reflex_blue" type="number" value="0" min="0" step="0.001"
+                                oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>Violet</label>
+                            <input id="f-violet" type="number" value="0" min="0" step="0.001" oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>Green</label>
+                            <input id="f-green" type="number" value="0" min="0" step="0.001" oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>Silver</label>
+                            <input id="f-silver" type="number" value="0" min="0" step="0.001" oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>Gold</label>
+                            <input id="f-gold" type="number" value="0" min="0" step="0.001" oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>Varnish</label>
+                            <input id="f-varnish" type="number" value="0" min="0" step="0.001" oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>Transparent Base</label>
+                            <input id="f-transparent_base" type="number" value="0" min="0" step="0.001"
+                                oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>Fluor Pink</label>
+                            <input id="f-fluor_pink" type="number" value="0" min="0" step="0.001"
+                                oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>Orange</label>
+                            <input id="f-fluor_yellow" type="number" value="0" min="0" step="0.001"
+                                oninput="onColorInput()">
+                        </div>
+                        <div class="form-group"><label>Warm Red</label>
+                            <input id="f-rubine_red" type="number" value="0" min="0" step="0.001"
+                                oninput="onColorInput()">
+                        </div>
+                    </div>
+
+                    <!-- LAB VALUES -->
+                    <div style="margin-top:22px;margin-bottom:14px;padding-bottom:10px;
+                    border-bottom:1px solid var(--border);font-size:0.82rem;font-weight:700;
+                    color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px">
+                        🔬 Lab Values (optional — from spectrophotometer)
+                    </div>
+
+                    <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr">
+                        <div class="form-group">
+                            <label>L* (Lightness 0–100)</label>
+                            <input id="f-lab_l" type="number" step="0.01" min="0" max="100" placeholder="e.g. 52.4"
+                                oninput="onColorInput()">
+                        </div>
+                        <div class="form-group">
+                            <label>a* (Green–Red)</label>
+                            <input id="f-lab_a" type="number" step="0.01" min="-128" max="127" placeholder="e.g. 44.2"
+                                oninput="onColorInput()">
+                        </div>
+                        <div class="form-group">
+                            <label>b* (Blue–Yellow)</label>
+                            <input id="f-lab_b" type="number" step="0.01" min="-128" max="127" placeholder="e.g. 28.6"
+                                oninput="onColorInput()">
+                        </div>
+                    </div>
+
+                    <!-- MATCH MODE BUTTONS -->
+                    <div style="margin-top:22px;margin-bottom:4px;font-size:0.82rem;font-weight:700;
+                    color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px">
+                        Best Match Mode
+                    </div>
+                    <div style="display:flex;gap:10px;margin-bottom:4px">
+                        <button id="btn-match-ratio" class="btn btn-primary" type="button"
+                            onclick="setMatchMode('ratio')">
+                            📊 Ratio Match
+                        </button>
+                        <button id="btn-match-deltae" class="btn btn-ghost" type="button"
+                            onclick="setMatchMode('deltae')">
+                            🔬 Delta E Match
+                        </button>
+                    </div>
+                    <div style="font-size:0.78rem;color:var(--text-3);margin-bottom:16px">
+                        Ratio: compares ink component ratios with perceptual weights &nbsp;|&nbsp;
+                        Delta E: CIE 2000 perceptual color difference (requires Lab values)
+                    </div>
+
+                    <!-- BEST MATCH RESULT -->
+                    <div id="match-box" style="display:none"></div>
+
+                    <!-- SAVE -->
+                    <div class="btn-row" style="margin-top:20px">
+                        <button class="btn btn-primary" id="save-btn" onclick="saveFormula()">💾 Save
+                            Formula</button>
+                        <button class="btn btn-ghost" onclick="resetForm()">Clear</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ARCHIVE -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title">Formula Archive</span>
+                <button class="btn btn-ghost" onclick="loadFormulas()">↺ Refresh</button>
+            </div>
+            <div style="padding:16px 20px 0">
+                <div class="search-bar">
+                    <input id="search-input" placeholder="Search by code or name..." oninput="filterFormulas()">
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Drum</th>
+                            <th>Components</th>
+                            <th>Returned</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="formulas-tbody">
+                        <tr class="empty-row">
+                            <td colspan="7">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <!-- VIEW MODAL -->
+    <div class="modal-overlay" id="view-modal" onclick="handleOverlayClick(event)">
+        <div class="modal" style="max-width:700px">
+            <div class="modal-header">
+                <span class="modal-title" id="modal-title">Formula Details</span>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="return-modal" onclick="closeReturnModal(event)">
+        <div class="modal" style="max-width:700px">
+            <div class="modal-header">
+                <span class="modal-title">Batch Return History</span>
+                <button class="modal-close" onclick="closeReturnModal()">✕</button>
+            </div>
+
+            <div id="return-modal-body" style="padding:16px">
+                Loading...
+            </div>
+        </div>
+    </div>
+    <script src="config.js"></script>
+    <script src="formulas.js?v=2"></script>
+    <script src="pdf.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(reg => reg.unregister())).catch(() => { });
+        }
+        if ('caches' in window) {
+            caches.keys().then(keys => keys.forEach(key => caches.delete(key))).catch(() => { });
+        }
+    </script>
+</body>
+
+</html>
