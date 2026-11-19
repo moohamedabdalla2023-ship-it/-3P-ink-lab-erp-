@@ -5,10 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sample Inspection — INK LAB ERP</title>
-    <link rel="stylesheet" href="./style.css">
-    <link rel="stylesheet" href="sample-inspection.css?v=28">
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
-    <link rel="manifest" href="./manifest.json">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="sample-inspection.css">
+    <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#6393ff">
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
@@ -19,7 +18,7 @@
     <div class="bg-grid"></div>
 
     <header>
-        <a class="logo-wrap" href="./index.html" style="text-decoration:none">
+        <a class="logo-wrap" href="../index.html" style="text-decoration:none">
             <div class="logo-icon">⬡</div>
             <div>
                 <h1>INK LAB</h1>
@@ -27,10 +26,10 @@
             </div>
         </a>
         <nav>
-            <a href="./index.html">Dashboard</a>
-            <a href="./formulas.html">Formulas</a>
-            <a href="./batches.html">Batches</a>
-            <a href="./stock.html">Stock</a>
+            <a href="../index.html">Dashboard</a>
+            <a href="../formulas.html">Formulas</a>
+            <a href="../batches.html">Batches</a>
+            <a href="../stock.html">Stock</a>
             <a href="sample-inspection.html" class="active">Sample Inspection</a>
         </nav>
         <div class="header-right">
@@ -92,10 +91,6 @@
                         <div class="form-group">
                             <label>Job / Order No *</label>
                             <input id="i-job" placeholder="e.g. JO-2026-0451" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            <label>Roll No (رقم الرول)</label>
-                            <input id="i-roll" type="number" min="1" step="1" value="1">
                         </div>
                         <div class="form-group">
                             <label>Customer</label>
@@ -192,19 +187,33 @@
 
                     <!-- 3 STATIONS -->
                     <div class="sec-title">3 · Color Stations (Lab: Target vs Measured)</div>
-                    <div class="st-grid" id="st-body"></div>
+                    <div class="table-wrap">
+                        <table class="st-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Color / Pantone</th>
+                                    <th>Batch No</th>
+                                    <th>Anilox</th>
+                                    <th>Visc (s)</th>
+                                    <th>T-L</th>
+                                    <th>T-a</th>
+                                    <th>T-b</th>
+                                    <th>M-L</th>
+                                    <th>M-a</th>
+                                    <th>M-b</th>
+                                    <th>ΔE</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="st-body"></tbody>
+                        </table>
+                    </div>
                     <button class="btn btn-ghost" style="margin-top:10px" onclick="addStation()">+ Add Station</button>
                     <div class="hint">ΔE = CIE76 · Viscosity: Zahn #2 / DIN 4 cup</div>
 
                     <!-- 4 CHECKS -->
                     <div class="sec-title">4 · Print Quality Checks</div>
-                    <div class="chk-bar">
-                        <div class="chk-count" id="chk-count"></div>
-                        <div class="btn-row" style="margin:0">
-                            <button type="button" class="btn btn-ghost" onclick="setAllChk('pass')">✓ All Pass</button>
-                            <button type="button" class="btn btn-ghost" onclick="setAllChk('na')">Reset</button>
-                        </div>
-                    </div>
                     <div class="chk-grid" id="chk-grid"></div>
 
                     <!-- 5 MEASUREMENTS -->
@@ -214,14 +223,9 @@
                             <label>Register Error (mm) — max 0.15</label>
                             <input id="m-reg" type="number" step="0.01" oninput="evalAuto()">
                         </div>
-                        <div class="form-group" style="grid-column:1/-1">
-                            <label>Repeat Length (mm) — Standard / ± Tolerance / Measured &nbsp; (الطول المعياري / السماح / المقاس)</label>
-                            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:8px;align-items:center">
-                                <input id="m-repeat-std" type="number" step="0.01" placeholder="Standard" oninput="repeatEval()">
-                                <input id="m-repeat-tol" type="number" step="0.01" min="0" placeholder="± Tol" value="0.2" oninput="repeatEval()">
-                                <input id="m-repeat" type="number" step="0.01" placeholder="Measured" oninput="repeatEval()">
-                                <span id="m-repeat-badge" class="chip-mini" style="min-width:92px;text-align:center;font-weight:800">—</span>
-                            </div>
+                        <div class="form-group">
+                            <label>Repeat Length (mm)</label>
+                            <input id="m-repeat" type="number" step="0.01">
                         </div>
                         <div class="form-group">
                             <label>Residual Solvent (mg/m²) — max 10</label>
@@ -249,121 +253,8 @@
                     </div>
                     <div id="auto-warn"></div>
 
-                    <!-- 6 IMAGE COMPARE -->
-                    <div class="sec-title">6 · Auto Image Comparison (Reference vs Production Sample)</div>
-                    <div class="cmp-wrap">
-                        <!-- LEFT: setup -->
-                        <div class="cmp-side">
-                            <div class="cmp-box">
-                                <div class="cmp-h">📷 Images</div>
-                                <div class="hint" style="background:var(--bg-2,#f3f6fa);border-radius:8px;padding:8px 10px;margin-bottom:8px;line-height:1.7">
-                                    📸 <b>للحصول على أدق نتيجة / For best accuracy:</b><br>
-                                    • الليبل مسطّح على ورقة بيضا · Lay the label flat on white paper<br>
-                                    • نور ثابت من شباك أو لمبة، بدون فلاش · Steady light, no flash<br>
-                                    • الموبايل من فوق بشكل مستقيم · Phone straight above<br>
-                                    • الصورتين بنفس الاتجاه والمسافة · Same direction and distance
-                                </div>
-                                <div class="form-group">
-                                    <label>Reference Image (approved)</label>
-                                    <input id="img-ref" type="file" accept="image/*" onchange="loadImg('ref',this)">
-                                </div>
-                                <div class="form-group" style="margin-top:8px">
-                                    <label>Production Sample Image</label>
-                                    <input id="img-smp" type="file" accept="image/*" onchange="loadImg('smp',this)">
-                                </div>
-                            </div>
-
-                            <div class="cmp-box fold">
-                                <div class="cmp-h">📚 Reference Library</div>
-                                <div class="cmp-grid">
-                                    <div class="form-group">
-                                        <label>Design Ref No.</label>
-                                        <input id="ref-code" placeholder="e.g. D-1042" autocomplete="off">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Design Name</label>
-                                        <input id="ref-name" placeholder="e.g. Mayo 600ml front" autocomplete="off">
-                                    </div>
-                                </div>
-                                <div class="form-group" style="margin-top:8px">
-                                    <label>🔎 Search library</label>
-                                    <input id="ref-search" placeholder="code / name / customer" autocomplete="off" oninput="fillRefSelect()">
-                                </div>
-                                <div class="form-group" style="margin-top:8px">
-                                    <label>Saved references</label>
-                                    <select id="ref-lib"><option value="">…</option></select>
-                                </div>
-                                <div class="btn-row" style="margin-top:10px">
-                                    <button class="btn btn-ghost" onclick="useFromLib()">📥 Use as Reference</button>
-                                    <button class="btn btn-ghost" onclick="saveToLib('ref')">💾 Save Reference</button>
-                                    <button class="btn btn-ghost" onclick="saveToLib('smp')">💾 Save Sample as Ref.</button>
-                                    <button class="btn btn-ghost" onclick="deleteFromLib()">🗑 Delete</button>
-                                </div>
-                            </div>
-
-                            <div class="cmp-box fold">
-                                <div class="cmp-h">⚙️ Options</div>
-                                <div class="cmp-grid">
-                                    <div class="form-group">
-                                        <label>Report Language</label>
-                                        <select id="img-rlang">
-                                            <option value="ar" selected>العربية</option>
-                                            <option value="en">English</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>AI Detail</label>
-                                        <select id="ai-detail">
-                                            <option value="quick">⚡ Quick (≈10–20 s)</option>
-                                            <option value="fast" selected>Balanced (recommended)</option>
-                                            <option value="high">🔍 Strong (tiny text, slower)</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>OCR Language (Quick Check)</label>
-                                        <select id="img-lang">
-                                            <option value="eng">English</option>
-                                            <option value="eng+ara">English + Arabic</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Color Sensitivity</label>
-                                        <select id="img-sens">
-                                            <option value="14">Low</option>
-                                            <option value="9" selected>Medium</option>
-                                            <option value="6">High</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group" style="margin-top:8px">
-                                    <label>Gemini API Key (saved on this device only)</label>
-                                    <input id="ai-key" type="password" placeholder="AIza... / AQ... — from aistudio.google.com" autocomplete="off">
-                                </div>
-                                <div class="btn-row" style="margin-top:10px">
-                                    <button class="btn btn-ghost" onclick="testAI()">🔌 Test AI key</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- RIGHT: images + result -->
-                        <div class="cmp-main">
-                            <div class="btn-row">
-                                <button class="btn btn-primary" id="ai-btn" onclick="analyzeAI()">🤖 Smart Analysis (AI)</button>
-                                <button class="btn btn-ghost" id="analyze-btn" onclick="analyzeImages()">⚡ Quick Check (offline)</button>
-                                <button class="btn btn-ghost" onclick="imgReset()">Clear Images</button>
-                            </div>
-                            <div class="hint" id="ocr-progress"></div>
-                            <div class="img-prev-row">
-                                <div><div class="hint">Reference</div><img id="prev-ref" class="img-prev" style="display:none"></div>
-                                <div><div class="hint">Sample</div><img id="prev-smp" class="img-prev" style="display:none"></div>
-                            </div>
-                            <div class="hint">Tip: shoot both images flat, same angle, same distance, good even light, no flash/glare — the closer the framing, the more accurate the result.</div>
-                            <div id="img-results"></div>
-                        </div>
-                    </div>
-
-                    <!-- 7 DECISION -->
-                    <div class="sec-title">7 · Final Decision</div>
+                    <!-- 6 DECISION -->
+                    <div class="sec-title">6 · Final Decision</div>
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Decision</label>
@@ -446,8 +337,8 @@
         </div>
     </div>
 
-    <script src="./config.js"></script>
-    <script src="sample-inspection.js?v=30"></script>
+    <script src="../config.js"></script>
+    <script src="sample-inspection.js?v=1"></script>
 </body>
 
 </html>
