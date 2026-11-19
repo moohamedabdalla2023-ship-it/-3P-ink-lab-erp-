@@ -217,6 +217,7 @@ function resetForm() {
     document.querySelectorAll("#inspection-form input:not(#i-tol)").forEach(i => i.value = "");
     document.getElementById("i-tol").value = "3";
     document.getElementById("m-repeat-tol").value = "0.2";
+    document.getElementById("i-roll").value = "1";
     CHECKS.forEach(([k]) => setChk(k, "na", true)); chkCount();
     document.getElementById("m-bar").value = "";
     document.getElementById("st-body").innerHTML = "";
@@ -227,6 +228,24 @@ function resetForm() {
     document.getElementById("i-date").value = nowLocal();
     imgReset(true);
     repeatEval();
+}
+
+// next roll of the SAME job: keep job / setup / reference / colour targets; clear everything measured on the previous roll
+function nextRoll(n) {
+    ["m-reg", "m-repeat", "m-solv", "m-adh", "m-rub", "r-notes"].forEach(id => { const e = document.getElementById(id); if (e) e.value = ""; });
+    const bar = document.getElementById("m-bar"); if (bar) bar.value = "";
+    CHECKS.forEach(([k]) => setChk(k, "na", true)); chkCount();
+    document.querySelectorAll("#st-body .st-card").forEach(c => c.querySelectorAll('[data-f^="m"]').forEach(i => { if (["mL", "ma", "mb"].includes(i.dataset.f)) i.value = ""; }));
+    imgData.smp = null; imgResult = null;
+    const p = document.getElementById("prev-smp"); if (p) { p.src = ""; p.style.display = "none"; }
+    const r = document.getElementById("img-results"); if (r) r.innerHTML = "";
+    const pr = document.getElementById("ocr-progress"); if (pr) pr.textContent = "";
+    const rl = document.getElementById("i-roll"); if (rl) rl.value = n;
+    document.getElementById("i-date").value = nowLocal();
+    manualResult = false;
+    calcAllDE(); repeatEval();
+    if (typeof showTab === "function") showTab(0, true);
+    showToast("Roll " + n + " ready — job & setup kept (جاهز للرول " + n + ")", "success");
 }
 
 // ── STATIONS ─────────────────────────────────────────────────
@@ -347,7 +366,7 @@ function paintResult() {
 }
 
 // ── SAVE ─────────────────────────────────────────────────────
-async function saveInspection() {
+async function saveInspection(goNext) {
     const job_no = val("i-job").trim();
     const inspector = val("i-inspector").trim();
 
@@ -357,10 +376,11 @@ async function saveInspection() {
     const checks = {};
     CHECKS.forEach(([k]) => checks[k] = val("c-" + k));
     checks._repeat_std = num("m-repeat-std"); checks._repeat_tol = num("m-repeat-tol");
+    const roll = Math.max(1, parseInt(val("i-roll")) || 1); checks._roll = roll;
     const stations = [...document.querySelectorAll("#st-body .st-card")].map(rowVals);
 
     const body = {
-        inspection_no: val("i-no"),
+        inspection_no: val("i-no") + "-R" + roll,
         inspected_at:  new Date(val("i-date") || Date.now()).toISOString(),
         job_no, inspector,
         customer: val("i-customer").trim(),
@@ -391,8 +411,9 @@ async function saveInspection() {
 
     const result = await dbPost("sample_inspections", body);
     if (result.ok) {
-        showToast("✓ Inspection saved", "success");
-        resetForm(); toggleForm(); loadInspections();
+        showToast("✓ Inspection saved — Roll " + roll, "success");
+        if (goNext === true) { nextRoll(roll + 1); loadInspections(); }
+        else { resetForm(); toggleForm(); loadInspections(); }
     } else {
         showToast("Error: " + (result.data?.message || "Unknown"), "error");
     }
@@ -545,7 +566,7 @@ function printInspection(id) {
 
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
         <title>${esc(x.inspection_no)}</title>
-        <link rel="stylesheet" href="../style.css">
+        <link rel="stylesheet" href="./style.css">
         <link rel="stylesheet" href="sample-inspection.css">
         <style>
             body{background:#fff!important;color:#000!important;padding:20px}
@@ -1998,7 +2019,13 @@ function buildTabs() {
     act.innerHTML = `<button type="button" class="btn btn-ghost" id="tab-back" onclick="showTab(curTab - 1, true)">← Back</button>
                      <button type="button" class="btn btn-ghost" id="tab-next" onclick="showTab(curTab + 1, true)">Next →</button>`;
     const saveBtn = body.querySelector('button[onclick="saveInspection()"]');
-    if (saveBtn) act.appendChild(saveBtn);
+    if (saveBtn) {
+        saveBtn.textContent = "💾 Save";
+        const nb = document.createElement("button");
+        nb.type = "button"; nb.className = "btn btn-primary"; nb.textContent = "💾➕ Save & Next Roll";
+        nb.setAttribute("onclick", "saveInspection(true)");
+        act.appendChild(nb); act.appendChild(saveBtn);
+    }
     body.appendChild(act);
     showTab(0);
 }
