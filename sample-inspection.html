@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sample Inspection — INK LAB ERP</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="sample-inspection (1).css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="sample-inspection.css?v=28">
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#6393ff">
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
@@ -19,7 +19,7 @@
     <div class="bg-grid"></div>
 
     <header>
-        <a class="logo-wrap" href="index.html" style="text-decoration:none">
+        <a class="logo-wrap" href="../index.html" style="text-decoration:none">
             <div class="logo-icon">⬡</div>
             <div>
                 <h1>INK LAB</h1>
@@ -27,10 +27,10 @@
             </div>
         </a>
         <nav>
-            <a href="index.html">Dashboard</a>
-            <a href="formulas.html">Formulas</a>
-            <a href="batches.html">Batches</a>
-            <a href="stock.html">Stock</a>
+            <a href="../index.html">Dashboard</a>
+            <a href="../formulas.html">Formulas</a>
+            <a href="../batches.html">Batches</a>
+            <a href="../stock.html">Stock</a>
             <a href="sample-inspection.html" class="active">Sample Inspection</a>
         </nav>
         <div class="header-right">
@@ -92,6 +92,10 @@
                         <div class="form-group">
                             <label>Job / Order No *</label>
                             <input id="i-job" placeholder="e.g. JO-2026-0451" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label>Roll No (رقم الرول)</label>
+                            <input id="i-roll" type="number" min="1" step="1" value="1">
                         </div>
                         <div class="form-group">
                             <label>Customer</label>
@@ -442,8 +446,8 @@
         </div>
     </div>
 
-    <script src="config.js"></script>
-    <script src="sample-inspection.js?v=27"></script>
+    <script src="../config.js"></script>
+    <script src="sample-inspection.js?v=29"></script>
 </body>
 
 </html>
